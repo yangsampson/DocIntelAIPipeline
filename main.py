@@ -17,25 +17,27 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.get("/")
 async def serve_index():
-    # Attempt 1: Direct relative path (most reliable in Docker)
-    index_path = "frontend/index.html"
+    # 1. Try the most direct path first
+    # In Docker, this usually maps to /app/frontend/index.html
+    index_path = os.path.join("frontend", "index.html")
     
     if os.path.exists(index_path):
         return FileResponse(index_path)
     
-    # Attempt 2: Absolute path fallback
-    base_path = os.path.dirname(os.path.abspath(__file__))
-    absolute_path = os.path.join(base_path, "frontend", "index.html")
+    # 2. Try an absolute path construction
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    alt_path = os.path.join(base_dir, "frontend", "index.html")
     
-    if os.path.exists(absolute_path):
-        return FileResponse(absolute_path)
+    if os.path.exists(alt_path):
+        return FileResponse(alt_path)
 
-    # If both fail, tell us WHERE it looked so we can fix the Dockerfile
+    # 3. DEBUG MODE: If it's still blank/404, this returns a list of files
+    # This will show you exactly what Render sees inside your container.
     return {
-        "error": "HTML not found",
-        "checked_paths": [index_path, absolute_path],
-        "current_directory": os.getcwd(),
-        "directory_contents": os.listdir()
+        "error": "index.html not found",
+        "current_working_dir": os.getcwd(),
+        "files_in_root": os.listdir("."),
+        "tried_paths": [index_path, alt_path]
     }
 
 @app.post("/upload")
