@@ -17,11 +17,26 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.get("/")
 async def serve_index():
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    index_path = os.path.join(current_dir, "frontend", "index.html")
-    if not os.path.exists(index_path):
-        return {"error": "HTML file missing inside container"}
-    return FileResponse(index_path)
+    # Attempt 1: Direct relative path (most reliable in Docker)
+    index_path = "frontend/index.html"
+    
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    
+    # Attempt 2: Absolute path fallback
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    absolute_path = os.path.join(base_path, "frontend", "index.html")
+    
+    if os.path.exists(absolute_path):
+        return FileResponse(absolute_path)
+
+    # If both fail, tell us WHERE it looked so we can fix the Dockerfile
+    return {
+        "error": "HTML not found",
+        "checked_paths": [index_path, absolute_path],
+        "current_directory": os.getcwd(),
+        "directory_contents": os.listdir()
+    }
 
 @app.post("/upload")
 async def upload_document(file: UploadFile = File(...)):
