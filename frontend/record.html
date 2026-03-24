@@ -72,14 +72,24 @@
 
         async function loadRecords() {
             try {
+                // 1. Get the list of IDs this specific user uploaded
+                const myUploads = JSON.parse(localStorage.getItem('myUploads')) || [];
+                
                 const response = await fetch(`/api/records?page=${currentPage}&limit=${limit}`);
                 const data = await response.json();
                 const tbody = document.getElementById('record-body');
                 tbody.innerHTML = "";
-                totalRecords = data.total;
                 document.getElementById('loader').style.display = 'none';
 
-                data.records.forEach(folder => {
+                // 2. FILTER the results: only show folders that exist in 'myUploads'
+                const filteredRecords = data.records.filter(folder => myUploads.includes(folder));
+
+                if (filteredRecords.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No records found for your session.</td></tr>";
+                    return;
+                }
+
+                filteredRecords.forEach(folder => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td><strong>${folder}</strong></td>
@@ -97,9 +107,8 @@
                     tbody.appendChild(row);
                 });
 
+                // Note: Pagination logic might need adjustment since we are filtering client-side now
                 document.getElementById('pageIndicator').innerText = `Page ${currentPage}`;
-                document.getElementById('prevBtn').disabled = currentPage === 1;
-                document.getElementById('nextBtn').disabled = (currentPage * limit) >= totalRecords;
             } catch (err) {
                 document.getElementById('loader').innerText = "❌ Error connecting to server.";
             }
@@ -113,6 +122,12 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ folders: [name] })
             });
+
+            // Remove from LocalStorage list
+            let history = JSON.parse(localStorage.getItem('myUploads')) || [];
+            history = history.filter(id => id !== name);
+            localStorage.setItem('myUploads', JSON.stringify(history));
+
             loadRecords();
         }
 
