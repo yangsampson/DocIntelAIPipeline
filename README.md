@@ -1,4 +1,4 @@
-# DocumentExtractor
+# DocIntel Pipeline
 
 Live Application: https://documentextractor-mbx5.onrender.com/
 
