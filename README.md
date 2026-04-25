@@ -1,72 +1,66 @@
-# DocIntel AI Pipeline
+# 📑 DocIntel AI Pipeline
 
+[![Live Demo](https://img.shields.io/badge/Live-Application-brightgreen?style=for-the-badge&logo=render&logoColor=white)](https://documentextractor-mbx5.onrender.com/)
+[![Docker CI with Pytest](https://github.com/syang48/DocumentExtractor/actions/workflows/pytest.yml/badge.svg)](https://github.com/syang48/DocumentExtractor/actions/workflows/pytest.yml)
 
-Live Application: https://documentextractor-mbx5.onrender.com/
+**DocIntel AI** is a high-precision automated pipeline engineered to surgically isolate high-value components—specifically **Headers and Signatures**—from unstructured documents. By orchestrating LibreOffice for robust normalization and Amazon Textract for spatial intelligence, the system delivers pixel-perfect extraction from messy, real-world files.
 
-[![Docker CI with Pytest](https://github.com)]([![Docker CI with Pytest](https://github.com/syang48/DocumentExtractor/actions/workflows/pytest.yml/badge.svg)](https://github.com/syang48/DocumentExtractor/actions/workflows/pytest.yml))
+---
 
-DocumentExtractor is an automated pipeline designed to isolate high-value components (Headers and Signatures) from unstructured documents. By combining LibreOffice for robust format conversion and Amazon Textract for spatial intelligence, the system provides pixel-perfect extraction across various file types.
+## 🚀 The Technical Pipeline
 
-<img width="642" height="910" alt="Screenshot 2026-03-23 at 4 17 03 PM" src="https://github.com/user-attachments/assets/c7a7df7c-2dd6-445d-9add-05c866ecb7cf" />
+The system transforms raw, unstructured data into actionable visual assets through a five-stage specialized workflow:
 
-The Technical Pipeline
+### 1. Document Ingestion
+A high-performance **FastAPI** interface handles concurrent uploads of `.docx` and `.pdf` files, providing immediate validation and queuing.
 
-1. Document Ingestion
+### 2. Format Normalization (The "Clean Room")
+To ensure 100% analysis consistency, documents undergo a two-phase standardization:
+* **Phase A:** Legacy `.docx` files are processed via **LibreOffice Headless** to maintain layout integrity during PDF conversion.
+* **Phase B:** PDFs are rasterized into high-resolution PNGs via **PyMuPDF (fitz)**, creating a stable canvas for coordinate mapping.
 
-The system features a FastAPI web interface that accepts high-volume uploads of both .docx and .pdf files.
-2. Format Normalization (LibreOffice)
+### 3. Spatial Intelligence (AWS Textract)
+The normalized image is analyzed by **Amazon Textract**. Rather than just performing simple OCR, the system extracts precise **BoundingBox** metadata:
+$$Area = (x, y, width, height)$$
+This spatial DNA allows the pipeline to "understand" exactly where components live on the page.
 
-To ensure consistent analysis, all documents undergo a two-phase standardization process:
+### 4. Targeted Extraction
+Custom-built extractors apply logic to the spatial data:
+* **Header_Extractor:** Maps top-region coordinates to isolate metadata and branding.
+* **Signature_Extractor:** Utilizes spatial pattern recognition to pinpoint and crop legal signature blocks.
 
-    Phase A: Incoming .docx files are processed via LibreOffice Headless to convert them into standard PDFs, preserving complex proprietary formatting.
+### 5. Final Output & Lossless Cropping
+Using **OpenCV**, the pipeline performs a surgical, lossless crop based on the identified coordinates, exporting the final results as high-fidelity PNG assets.
 
-    Phase B: The resulting PDF is rasterized into a high-resolution PNG using PyMuPDF (fitz) to prepare for visual coordinate mapping.
+---
 
-3. Spatial Analysis (AWS Textract)
+## 🗄️ Record Management & Auditing
 
-The normalized PNG is analyzed by Amazon Textract. The service identifies text blocks and layout elements, returning precise BoundingBox coordinates:
-(x,y,w,h)
+The platform features a dedicated **Records Tab**, serving as a robust management layer for your document history:
 
+* **Audit Logging:** Every file is indexed with metadata for full traceability.
+* **Instant Recall:** Revisit and review any previously processed document without re-processing.
+* **Asset Persistence:** Extracted headers and signatures are stored and ready for download, eliminating redundant AWS Textract costs.
 
-<img width="457" height="764" alt="Screenshot 2026-03-23 at 4 16 21 PM" src="https://github.com/user-attachments/assets/a56c9891-82ac-4f7d-b5c3-b1c33189156e" />
+---
 
-4. Targeted Extraction
+## 🛠 Tech Stack
 
-    Header_Extractor: Maps Textract coordinates to the document's top region to isolate metadata and letterheads.
+### **Core Infrastructure**
+* **Backend:** FastAPI (Python) - High-speed asynchronous API framework.
+* **AI/ML Analysis:** Amazon Textract - Deep learning for layout and coordinate extraction.
+* **Architectural Guidance:** Google Gemini - Algorithmic optimization and logic design.
 
-    Signature_Extractor: Utilizes spatial pattern recognition to locate and isolate signature blocks.
+### **Document & Image Processing**
+* **Normalization:** LibreOffice (Headless) - Industry-standard document conversion.
+* **Rasterization:** PyMuPDF - High-resolution PDF-to-image processing.
+* **Computer Vision:** OpenCV - Coordinate-based image manipulation and cropping.
 
-5. Final Output
+---
 
-Using OpenCV, the service performs a lossless crop based on the identified coordinates, exporting the final results as individual, high-quality PNG files.
+## 📦 Installation & Setup
 
-
-
-The platform includes a dedicated Record Tab, providing a robust management layer for previously processed work.
-
-<img width="702" height="736" alt="Screenshot 2026-03-23 at 11 01 22 PM" src="https://github.com/user-attachments/assets/ec370821-584e-4e77-ad01-a18cfad42d9b" />
-
-
-Document Logging: Every processed file is indexed with its original metadata for easy auditing.
-
-History Tracking: Users can instantly revisit and review previously uploaded documents.
-
-Asset Management: Extracted Header and Signature PNGs remain accessible for download without requiring a re-run of the Textract analysis.
-
-Tech Stack
-
-Core Infrastructure
-
-    Backend: FastAPI (Python) – Asynchronous API framework.
-
-    AI/ML Analysis: Amazon Textract – Deep learning for layout and coordinate extraction.
-
-    Development Assistance: Google Gemini – Architectural guidance and algorithmic optimization.
-
-Document & Image Processing
-
-    Format Conversion: LibreOffice (Headless) – Proprietary .docx to .pdf conversion.
-
-    PDF Manipulation: PyMuPDF – High-resolution rasterization.
-
-    Computer Vision: OpenCV – Final coordinate-based image cropping.
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/syang48/DocumentExtractor.git](https://github.com/syang48/DocumentExtractor.git)
+   cd DocumentExtractor
