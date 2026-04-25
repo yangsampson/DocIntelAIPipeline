@@ -39,8 +39,9 @@ The **Record Tab** provides a robust management layer for auditing and asset rec
 
 ## 🛠 Tech Stack
 
-* **AI/ML:** Amazon Textract (Spatial OCR), Google Gemini (Optimization).
-* **Backend:** FastAPI, Docker.
+* **AI/ML Analysis:** Amazon Textract — Deep learning for layout and coordinate extraction.
+* **Development Assistance:** Google Gemini — Architectural guidance and algorithmic optimization.
+* **Backend:** FastAPI, Docker, Render.
 * **Processing:** LibreOffice (Conversion), PyMuPDF (Rasterization), OpenCV (Computer Vision).
 
 ---
